@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Ukay-Ukay Shopping</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <!-- Navigation Bar -->
+        <table width="100%">
+          <tr>
+            <td rowspan="2"><p>Ukay-Ukay Shopping</p></td>
+            <td width="20%">
+              <form>
+                <input type="text" />
+                <input type="submit" value="Search" />
+              </form>
+            </td>
+          </tr>
+          <tr>
+            <td width="20%">
+              <a href="./index.html">Home</a>
+              <a href="./register.html">Register</a>
+              <a href="./login.html">Login</a>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2"><hr /></td>
+          </tr>
+        </table>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Content -->
+      <table width="100%">
+        <tr style="text-align: center">
+          <td colspan="3">
+            <h1>Register</h1>
+          </td>
+        </tr>
+        <tr>
+          <td width="35%"></td>
+          <td width="30%">
+            <form action="./login.html">
+              <table width="100%">
+                <tr>
+                  <td><label for="first_name">First name</label></td>
+                  <td><input type="text" id="first_name" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="last_name">Last name</label></td>
+                  <td><input type="text" id="last_name" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="gender">Gender</label></td>
+                  <td>
+                    <select id="gender" required>
+                      <option value="">Select...</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for="address">Address</label></td>
+                  <td><input type="text" id="address" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="dob">Date of Birth</label></td>
+                  <td><input type="date" id="dob" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="age">Age</label></td>
+                  <td><input type="number" id="age" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="email">Email</label></td>
+                  <td><input type="email" id="email" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="phone">Phone</label></td>
+                  <td><input type="tel" id="phone" required /></td>
+                </tr>
+                <tr>
+                  <td><label for="password">Password</label></td>
+                  <td><input type="password" id="password" required /></td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <input type="checkbox" id="accept" required />
+                    <label for="accept"
+                      >I accept the terms and conditions</label
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <input type="submit" value="Register" />
+                  </td>
+                </tr>
+              </table>
+            </form>
+          </td>
+          <td width="35%"></td>
+        </tr>
+      </table>
+    </main>
+
+    <footer>
+      <!-- Footer -->
+      <table width="100%" style="text-align: center">
+        <tr>
+          <td>
+            <p>Ukay-Ukay Shopping &copy; 2023</p>
+          </td>
+        </tr>
+      </table>
+    </footer>
+  </body>
+</html>
