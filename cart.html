@@ -9,76 +9,76 @@
   <body>
     <header>
       <nav>
-        <!-- Navigation Bar -->
-        <table width="100%">
-          <tr>
-            <td rowspan="2"><h2>Ukay-Ukay Shopping</h2></td>
-            <td width="20%">
-              <form>
-                <input type="text" />
-                <input type="submit" value="Search" />
-              </form>
-            </td>
-          </tr>
-          <tr>
-            <td width="20%">
-              <a href="./products.html">Home</a>
-              <a href="./cart.html">Cart</a>
-              <a href="./index.html">Logout</a>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2"><hr /></td>
-          </tr>
+        <table style="width: 100%">
+          <tbody>
+            <tr>
+              <td rowspan="2">
+                <a href="./index.html">Ukay-Ukay Shopping</a>
+              </td>
+              <td style="width: 15%; text-align: right">
+                <form>
+                  <input type="text" placeholder="Search" />
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 15%; text-align: right">
+                <a href="./products.html">Products</a>
+                <a href="./cart.html">Cart</a>
+                <a href="./index.html">Logout</a>
+              </td>
+            </tr>
+          </tbody>
         </table>
+        <hr />
       </nav>
     </header>
 
     <main>
-      <!-- Content -->
-      <table width="100%" style="text-align: center">
-        <tr>
-          <td>
-            <table width="100%">
-              <tr>
-                <td>Name</td>
-                <td>Quantity</td>
-                <td>Price</td>
-                <td>Total</td>
-                <td>Action</td>
-              </tr>
-              <tr>
-                <td>Product</td>
-                <td>2</td>
-                <td>P10</td>
-                <td>P20</td>
-                <td><button>Remove</button></td>
-              </tr>
-              <tr>
-                <td>Product</td>
-                <td>2</td>
-                <td>P10</td>
-                <td>P20</td>
-                <td><button>Remove</button></td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td><button>Continue shopping</button></td>
-        </tr>
-      </table>
+      <section style="text-align: center">
+        <h1>Cart</h1>
+      </section>
+
+      <section>
+        <table style="width: 100%; text-align: center">
+          <tbody>
+            <tr>
+              <td>
+                <table style="width: 100%">
+                  <tr>
+                    <td>Name</td>
+                    <td>Quantity</td>
+                    <td>Price</td>
+                    <td>Total</td>
+                    <td>Action</td>
+                  </tr>
+                  <tr>
+                    <td>Product</td>
+                    <td>2</td>
+                    <td>P10</td>
+                    <td>P20</td>
+                    <td><button type="button">Remove</button></td>
+                  </tr>
+                  <tr>
+                    <td>Product</td>
+                    <td>2</td>
+                    <td>P10</td>
+                    <td>P20</td>
+                    <td><button type="button">Remove</button></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td><button type="button">Continue shopping</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </main>
 
-    <footer>
-      <!-- Footer -->
-      <table width="100%" style="text-align: center">
-        <tr>
-          <td>
-            <p>Ukay-Ukay Shopping &copy; 2023</p>
-          </td>
-        </tr>
-      </table>
+    <footer style="text-align: center">
+      <p>Ukay-Ukay Shopping &copy; 2023</p>
     </footer>
   </body>
 </html>
