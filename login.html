@@ -5,74 +5,52 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Ukay-Ukay Shopping</title>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <header>
       <nav>
-        <table style="width: 100%">
-          <tbody>
-            <tr>
-              <td rowspan="2">
-                <a href="./index.html">Ukay-Ukay Shopping</a>
-              </td>
-              <td style="width: 15%; text-align: right">
-                <form>
-                  <input type="text" placeholder="Search" />
-                </form>
-              </td>
-            </tr>
-            <tr>
-              <td style="width: 15%; text-align: right">
-                <a href="./products.html">Products</a>
-                <a href="./register.html">Register</a>
-                <a href="./login.html">Login</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <hr />
+        <div class="container">
+          <div class="logo">
+            <a href="./index.html">Ukay-Ukay Shopping</a>
+          </div>
+          <div>
+            <div class="search">
+              <form>
+                <input type="text" placeholder="Search" />
+              </form>
+            </div>
+            <div class="links">
+              <a href="./products.html">Products</a>
+              <a href="./register.html">Register</a>
+              <a href="./login.html">Login</a>
+            </div>
+          </div>
+        </div>
       </nav>
     </header>
 
     <main>
-      <section style="text-align: center">
+      <section class="header container">
         <h1>Login</h1>
       </section>
 
-      <section>
-        <table style="width: 100%">
-          <tbody>
-            <tr>
-              <td style="width: 40%"></td>
-              <td>
-                <form action="./products.html">
-                  <table style="width: 100%">
-                    <tbody>
-                      <tr>
-                        <td><label for="email">Email</label></td>
-                        <td><input type="email" id="email" /></td>
-                      </tr>
-                      <tr>
-                        <td><label for="password">Password</label></td>
-                        <td><input type="password" id="password" /></td>
-                      </tr>
-                      <tr>
-                        <td colspan="2">
-                          <input type="submit" value="Login" />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </form>
-              </td>
-              <td style="width: 40%"></td>
-            </tr>
-          </tbody>
-        </table>
+      <section class="container">
+        <form action="./products.html">
+          <div class="form-control">
+            <label for="email">Email</label>
+            <input type="email" id="email" required />
+          </div>
+          <div class="form-control">
+            <label for="password">Password</label>
+            <input type="password" id="password" required />
+          </div>
+          <button type="submit">Login</button>
+        </form>
       </section>
     </main>
 
-    <footer style="text-align: center">
+    <footer>
       <p>Ukay-Ukay Shopping &copy; 2023</p>
     </footer>
   </body>
