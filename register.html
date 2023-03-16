@@ -5,56 +5,57 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Ukay-Ukay Shopping</title>
+    <link rel="stylesheet" href="./reset.css" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <header>
-      <nav>
+      <div class="header-half">
         <div class="container">
           <div class="logo">
             <a href="./index.html">Ukay-Ukay Shopping</a>
           </div>
-          <div>
-            <div class="search">
-              <form>
-                <input type="text" placeholder="Search" />
-              </form>
-            </div>
-            <div class="links">
-              <a href="./products.html">Products</a>
-              <a href="./register.html">Register</a>
-              <a href="./login.html">Login</a>
-            </div>
-          </div>
+          <form id="search">
+            <input type="text" placeholder="Search" />
+          </form>
         </div>
-      </nav>
+      </div>
+
+      <div class="header-half">
+        <div class="container">
+          <nav class="links">
+            <a href="./register.html">Register</a>
+            <a href="./login.html">Login</a>
+          </nav>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <section class="header container">
+    <main class="container">
+      <section class="header">
         <h1>Register</h1>
       </section>
 
-      <section class="container">
-        <form action="./products.html">
+      <section>
+        <form id="account" action="./products.html">
           <div class="form-group">
             <div class="form-control">
-              <label for="first_name">First name</label>
+              <label for="first_name">First name <small>*</small></label>
               <input type="text" id="first_name" required />
             </div>
             <div class="form-control">
               <label for="middle_name">Middle name</label>
-              <input type="text" id="middle_name" required />
+              <input type="text" id="middle_name" />
             </div>
             <div class="form-control">
-              <label for="last_name">Last name</label>
+              <label for="last_name">Last name <small>*</small></label>
               <input type="text" id="last_name" required />
             </div>
           </div>
 
           <div class="form-group">
             <div class="form-control">
-              <label for="gender">Gender</label>
+              <label for="gender">Gender <small>*</small></label>
               <select name="gender" id="gender">
                 <option value="">Select...</option>
                 <option value="male">Male</option>
@@ -63,35 +64,54 @@
               </select>
             </div>
             <div class="form-control">
-              <label for="age">Age</label>
-              <input type="text" id="age" required />
-            </div>
-            <div class="form-control">
-              <label for="dob">Date of Birth</label>
+              <label for="dob">Date of Birth <small>*</small></label>
               <input type="date" id="dob" required />
             </div>
           </div>
-          <div class="form-control">
-            <label for="address">Address</label>
-            <input type="text" id="address" required />
-          </div>
+
           <div class="form-group">
             <div class="form-control">
-              <label for="email">Email</label>
+              <label for="province">Province <small>*</small></label>
+              <input type="text" id="province" required />
+            </div>
+            <div class="form-control">
+              <label for="city">City <small>*</small></label>
+              <input type="text" id="city" required />
+            </div>
+            <div class="form-control">
+              <label for="barangay">Barangay <small>*</small></label>
+              <input type="text" id="barangay" required />
+            </div>
+            <div class="form-control">
+              <label for="zip">Zip Code <small>*</small></label>
+              <input type="text" id="zip" required />
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label for="address">
+              Street Name, Building, House No. <small>*</small>
+            </label>
+            <input type="text" id="address" required />
+          </div>
+
+          <div class="form-group">
+            <div class="form-control">
+              <label for="email">Email <small>*</small></label>
               <input type="email" id="email" required />
             </div>
             <div class="form-control">
-              <label for="username">Username</label>
-              <input type="text" id="username" required />
+              <label for="phone">Phone number <small>*</small></label>
+              <input type="tel" id="phone" required />
             </div>
           </div>
           <div class="form-group">
             <div class="form-control">
-              <label for="password">Password</label>
+              <label for="password">Password <small>*</small></label>
               <input type="password" id="password" required />
             </div>
             <div class="form-control">
-              <label for="repeat">Repeat Password</label>
+              <label for="repeat">Repeat Password <small>*</small></label>
               <input type="password" id="repeat" required />
             </div>
           </div>

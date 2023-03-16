@@ -5,118 +5,136 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ukay-Ukay Shopping</title>
+    <link rel="stylesheet" href="./reset.css" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <header>
-      <nav>
+      <div class="header-half">
         <div class="container">
           <div class="logo">
             <a href="./index.html">Ukay-Ukay Shopping</a>
           </div>
-          <div>
-            <div class="search">
-              <form>
-                <input type="text" placeholder="Search" />
-              </form>
-            </div>
-            <div class="links">
-              <a href="./products.html">Products</a>
-              <a href="./register.html">Register</a>
-              <a href="./login.html">Login</a>
-            </div>
-          </div>
+          <form id="search">
+            <input type="text" placeholder="Search" />
+          </form>
         </div>
-      </nav>
+      </div>
+
+      <div class="header-half">
+        <div class="container">
+          <nav class="links">
+            <a href="./register.html">Register</a>
+            <a href="./login.html">Login</a>
+          </nav>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <section class="header container">
+    <main class="container">
+      <section class="header">
         <h1>50% OFF FOR THE FIRST 100 BUYERS</h1>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus,
-          iure enim natus officiis explicabo dicta? Voluptas, voluptates!
-          Similique nam, aut nobis, dolor nihil quia distinctio blanditiis,
-          praesentium delectus veritatis atque?
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Asperiores
+          quis ea, voluptatum doloremque eum dolor dolorem! Facere qui aut
+          nesciunt ipsa? Dolores laborum tenetur et reiciendis, est repellat
+          assumenda minima. Accusantium blanditiis expedita aliquam. Ut placeat
+          esse ullam corporis impedit quis perferendis voluptates minima
+          recusandae ea mollitia, harum voluptatum corrupti totam laudantium,
+          accusamus vel unde reprehenderit eius voluptatibus eveniet, voluptas
+          voluptatem provident. Rerum eos dolorem sapiente dolorum nostrum
+          fugiat iure expedita repudiandae doloremque unde et a alias illum,
+          recusandae dolores, eius nihil in sequi quae sed quis laboriosam.
+          Itaque assumenda laudantium expedita maxime sunt libero quo ipsa,
+          magni nam voluptates?
         </p>
       </section>
 
-      <section class="container">
-        <div class="carousel-header">
-          <h2>New Arrivals</h2>
+      <section>
+        <div class="items-header">
+          <h2>Featured Products</h2>
           <a href="./products.html">View more</a>
         </div>
-        <div class="carousel">
-          <div class="carousel-item">
+        <div class="items">
+          <div class="item">
             <img
               src="./images/mediamodifier-ogmenj2NGho-unsplash.jpg"
               alt="product"
               width="100%"
             />
-            <p><strong>Product</strong><br /><em>P10</em></p>
+            <div class="item-info">
+              <div class="item-header">
+                <p>Product</p>
+                <p>P10</p>
+              </div>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
+                praesentium, saepe dolores sint inventore doloribus ullam earum
+                aliquam corrupti magni doloremque provident, totam ad
+                repellendus itaque? Mollitia velit dicta corrupti.
+              </p>
+              <button type="button">Add to cart</button>
+            </div>
           </div>
-          <div class="carousel-item">
+          <div class="item">
             <img
               src="./images/josue-escoto-crsQ7CNIovw-unsplash.jpg"
               alt="product"
               width="100%"
             />
-            <p><strong>Product</strong><br /><em>P10</em></p>
+            <div class="item-info">
+              <div class="item-header">
+                <p>Product</p>
+                <p>P10</p>
+              </div>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
+                praesentium, saepe dolores sint inventore doloribus ullam earum
+                aliquam corrupti magni doloremque provident, totam ad
+                repellendus itaque? Mollitia velit dicta corrupti.
+              </p>
+              <button type="button">Add to cart</button>
+            </div>
           </div>
-          <div class="carousel-item">
-            <img
-              src="./images/the-graphic-space-FTrGeAy0RW4-unsplash.jpg"
-              alt="product"
-              width="100%"
-            />
-            <p><strong>Product</strong><br /><em>P10</em></p>
-          </div>
-          <div class="carousel-item">
-            <img
-              src="./images/faith-yarn-hgtWvsq5e2c-unsplash.jpg"
-              alt="product"
-              width="100%"
-            />
-            <p><strong>Product</strong><br /><em>P10</em></p>
-          </div>
-        </div>
-
-        <div class="carousel-header">
-          <h2>Best Sellers</h2>
-          <a href="./products.html">View more</a>
-        </div>
-        <div class="carousel">
-          <div class="carousel-item">
-            <img
-              src="./images/justin-buisson-JU5_bUxr5Rg-unsplash.jpg"
-              alt="product"
-              width="100%"
-            />
-            <p><strong>Product</strong><br /><em>P10</em></p>
-          </div>
-          <div class="carousel-item">
-            <img
-              src="./images/ian-dooley-wzRKn-AjKf4-unsplash.jpg"
-              alt="product"
-              width="100%"
-            />
-            <p><strong>Product</strong><br /><em>P10</em></p>
-          </div>
-          <div class="carousel-item">
+          <div class="item">
             <img
               src="./images/gisela-carolina-82TqnDtVWTM-unsplash.jpg"
               alt="product"
               width="100%"
             />
-            <p><strong>Product</strong><br /><em>P10</em></p>
+            <div class="item-info">
+              <div class="item-header">
+                <p>Product</p>
+                <p>P10</p>
+              </div>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
+                praesentium, saepe dolores sint inventore doloribus ullam earum
+                aliquam corrupti magni doloremque provident, totam ad
+                repellendus itaque? Mollitia velit dicta corrupti.
+              </p>
+              <button type="button">Add to cart</button>
+            </div>
           </div>
-          <div class="carousel-item">
+          <div class="item">
             <img
-              src="./images/sven-ciupka-x8Vg7Up6TUc-unsplash.jpg"
+              src="./images/faith-yarn-hgtWvsq5e2c-unsplash.jpg"
               alt="product"
               width="100%"
             />
-            <p><strong>Product</strong><br /><em>P10</em></p>
+            <div class="item-info">
+              <div class="item-header">
+                <p>Product</p>
+                <p>P10</p>
+              </div>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid
+                praesentium, saepe dolores sint inventore doloribus ullam earum
+                aliquam corrupti magni doloremque provident, totam ad
+                repellendus itaque? Mollitia velit dicta corrupti.
+              </p>
+              <button type="button">Add to cart</button>
+            </div>
           </div>
         </div>
       </section>

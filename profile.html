@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Ukay-Ukay Shopping</title>
+    <link rel="stylesheet" href="./reset.css" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header-half">
+        <div class="container">
+          <div class="logo">
+            <a href="./products.html">Ukay-Ukay Shopping</a>
+          </div>
+          <form id="search">
+            <input type="text" placeholder="Search" />
+          </form>
+        </div>
+      </div>
+
+      <div class="header-half">
+        <div class="container">
+          <nav class="links">
+            <a href="./cart.html">Cart</a>
+            <a href="./profile.html">Profile</a>
+            <a href="./index.html">Logout</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="header">
+        <h1>Profile</h1>
+      </section>
+
+      <section>
+        <div class="profile">
+          <div class="profile-side">
+            <img
+              src="./images/raoul-droog-yMSecCHsIBc-unsplash.jpg"
+              alt="Profile"
+            />
+          </div>
+          <div class="profile-main">
+            <div class="info-group">
+              <p>Name</p>
+              <p>John Appleseed</p>
+            </div>
+            <div class="info-group">
+              <p>Gender</p>
+              <p>Male</p>
+            </div>
+            <div class="info-group">
+              <p>Birthdate</p>
+              <p>June 29, 2007</p>
+            </div>
+            <div class="info-group">
+              <p>Address</p>
+              <p>Merchan Street</p>
+              <p>Barangay 6, Lucena City, 4301 Quezon</p>
+            </div>
+            <div class="info-group">
+              <p>Email address</p>
+              <p>johnappleseed@icloud.com</p>
+            </div>
+            <div class="info-group">
+              <p>Phone number</p>
+              <p>(408) 555-0941</p>
+            </div>
+          </div>
+          <div class="profile-side">
+            <button
+              type="button"
+              onclick="window.location.href='./editprofile.html'"
+            >
+              Update info
+            </button>
+            <button type="button">Update password</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Ukay-Ukay Shopping &copy; 2023</p>
+    </footer>
+  </body>
+</html>

@@ -5,46 +5,48 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Ukay-Ukay Shopping</title>
+    <link rel="stylesheet" href="./reset.css" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <header>
-      <nav>
+      <div class="header-half">
         <div class="container">
           <div class="logo">
             <a href="./index.html">Ukay-Ukay Shopping</a>
           </div>
-          <div>
-            <div class="search">
-              <form>
-                <input type="text" placeholder="Search" />
-              </form>
-            </div>
-            <div class="links">
-              <a href="./products.html">Products</a>
-              <a href="./register.html">Register</a>
-              <a href="./login.html">Login</a>
-            </div>
-          </div>
+          <form id="search">
+            <input type="text" placeholder="Search" />
+          </form>
         </div>
-      </nav>
+      </div>
+
+      <div class="header-half">
+        <div class="container">
+          <nav class="links">
+            <a href="./register.html">Register</a>
+            <a href="./login.html">Login</a>
+          </nav>
+        </div>
+      </div>
     </header>
 
-    <main>
-      <section class="header container">
+    <main class="container">
+      <section class="header">
         <h1>Login</h1>
       </section>
 
-      <section class="container">
-        <form action="./products.html">
+      <section>
+        <form id="account" action="./products.html">
           <div class="form-control">
             <label for="email">Email</label>
-            <input type="email" id="email" required />
+            <input type="email" id="email" />
           </div>
           <div class="form-control">
             <label for="password">Password</label>
-            <input type="password" id="password" required />
+            <input type="password" id="password" />
           </div>
+          <a href="./forgot.html">Forgot password?</a>
           <button type="submit">Login</button>
         </form>
       </section>
