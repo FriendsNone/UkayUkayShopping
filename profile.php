@@ -1,3 +1,29 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION["customer"])) {
+  require_once "includes/database.php";
+
+  $customer_id = $_SESSION["customer"];
+
+  $stmt = $conn->prepare(
+    "SELECT first_name, middle_name, last_name, address, email_address, phone_number, customer_picture FROM customer WHERE customer_id = ?"
+  );
+  $stmt->bind_param("i", $customer_id);
+  $stmt->execute();
+  $stmt->store_result();
+  $stmt->bind_result($first_name, $middle_name, $last_name, $address, $email_address, $phone_number, $customer_picture);
+  $stmt->fetch();
+
+  $stmt->close();
+  $conn->close();
+} else {
+  header("Location: login.php?error=login");
+  exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -21,12 +47,12 @@
       }
     </style>
   </head>
-  <body>
+  <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
         <div class="container">
           <a
-            href="index.html"
+            href="index.php"
             class="navbar-brand my-auto h1">
             Ukay-Ukay Shopping
           </a>
@@ -40,28 +66,50 @@
           <div
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
-            <div class="navbar-nav ms-auto small">
-              <a
-                class="nav-link py-md-0"
-                href="shop.html">
-                Shop
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="cart.html">
-                Cart
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="profile.html">
-                Profile
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="logout.php">
-                Logout
-              </a>
-            </div>
+            <?php if (isset($_SESSION["customer"])): ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="shop.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="cart.php">
+                  Cart <?php if (isset($_SESSION["cart"])): ?>
+                      (<?php echo array_sum($_SESSION["cart"]); ?>)
+                  <?php endif; ?>
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="profile.php">
+                  Profile
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="logout.php">
+                  Logout
+                </a>
+              </div>
+            <?php else: ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="register.php">
+                  Register
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Login
+                </a>
+              </div>
+            <?php endif; ?>
             <form class="ms-auto">
               <div class="input-group input-group-sm">
                 <input
@@ -84,19 +132,22 @@
     <main>
       <section class="container my-5">
         <div class="p-5 text-center bg-body-tertiary rounded-3">
-          <!-- <img
-            src="./images/raoul-droog-yMSecCHsIBc-unsplash.jpg"
-            alt="profile"
-            class="rounded-circle mb-5"
-            width="200"
-            height="200" /> -->
-          <img
-            src="https://api.dicebear.com/6.x/initials/svg?seed=Maria"
-            alt="avatar"
-            class="rounded-circle mb-5"
-            width="200"
-            height="200" />
-          <h1 class="text-body-emphasis">Welcome back, Maria</h1>
+          <?php if ($customer_picture): ?>
+            <img
+              src="uploads/customer/<?php echo $customer_picture; ?>"
+              alt="profile"
+              class="rounded-circle mb-5"
+              width="200"
+              height="200" />
+          <?php else: ?>
+            <img
+              src="https://api.dicebear.com/6.x/initials/svg?seed=<?php echo $first_name; ?>"
+              alt="profile"
+              class="rounded-circle mb-5"
+              width="200"
+              height="200" />
+          <?php endif; ?>
+          <h1 class="text-body-emphasis">Welcome back, <?php echo $first_name; ?></h1>
         </div>
       </section>
 
@@ -268,7 +319,7 @@
               </div>
               <div class="text-center mt-5">
                 <a
-                  href="purchase-history.html"
+                  href="purchase-history.php"
                   class="btn btn-outline-primary px-4 rounded-pill">
                   Show Previous Purchases
                 </a>
@@ -281,23 +332,31 @@
               <h2 class="text-body-emphasis m-0">Profile Information</h2>
               <div class="mt-5">
                 <h5 class="text-body-secondary small">Name</h5>
-                <p class="text-body-emphasis h5">Maria Santos dela Cruz</p>
+                <p class="text-body-emphasis h5">
+                  <?php echo $first_name . " " . $middle_name . " " . $last_name; ?>
+                </p>
               </div>
               <div class="mt-3">
                 <h5 class="text-body-secondary small">Address</h5>
-                <p class="text-body-emphasis h5">1234 Main St. Barangay, City, Province 1234</p>
+                <p class="text-body-emphasis h5">
+                  <?php echo $address; ?>
+                </p>
               </div>
               <div class="mt-3">
                 <h5 class="text-body-secondary small">Email Address</h5>
-                <p class="text-body-emphasis h5 text-break">mariasantosdelacruz@example.com</p>
+                <p class="text-body-emphasis h5 text-break">
+                  <?php echo $email_address; ?>
+                </p>
               </div>
               <div class="mt-3">
                 <h5 class="text-body-secondary small">Phone Number</h5>
-                <p class="text-body-emphasis h5">09123456789</p>
+                <p class="text-body-emphasis h5">
+                  <?php echo $phone_number; ?>
+                </p>
               </div>
               <div class="text-center mt-5">
                 <a
-                  href="edit-profile.html"
+                  href="edit-profile.php"
                   class="btn btn-outline-primary px-4 rounded-pill">
                   Edit Profile
                 </a>
@@ -316,5 +375,13 @@
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"></script>
+
+      <script>
+        const theme = localStorage.getItem("theme");
+
+        if (theme) {
+        document.body.dataset.bsTheme = theme;
+        }
+      </script>
   </body>
 </html>

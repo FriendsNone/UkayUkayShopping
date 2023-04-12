@@ -1,3 +1,79 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION["customer"])) {
+  header("Location: shop.php");
+  exit();
+}
+
+require_once "includes/database.php";
+
+if (isset($_POST["register"])) {
+  $first_name = $_POST["first_name"];
+  $middle_name = $_POST["middle_name"];
+  $last_name = $_POST["last_name"];
+  $address = $_POST["address"];
+  $email_address = $_POST["email_address"];
+  $phone_number = $_POST["phone_number"];
+  $password = $_POST["password"];
+  $confirm_password = $_POST["confirm_password"];
+
+  $stmt = $conn->prepare("SELECT customer_id FROM customer WHERE email_address = ?");
+  $stmt->bind_param("s", $email_address);
+  $stmt->execute();
+  $stmt->store_result();
+
+  if ($stmt->num_rows > 0) {
+    header("Location: register.php?error=email");
+    exit();
+  }
+
+  // Phone Number validation
+  if (!preg_match("/^[0-9]{11}$/", $phone_number)) {
+    header("Location: register.php?error=phone_number");
+    exit();
+  }
+
+  if (strlen($password) < 8) {
+    header("Location: register.php?error=password_length");
+    exit();
+  }
+
+  if ($password != $confirm_password) {
+    header("Location: register.php?error=password_match");
+    exit();
+  }
+
+  $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+  $stmt = $conn->prepare(
+    "INSERT INTO customer (first_name, middle_name, last_name, address, email_address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?, ?)" 
+  );
+  $stmt->bind_param(
+    "sssssss",
+    $first_name,
+    $middle_name,
+    $last_name,
+    $address,
+    $email_address,
+    $phone_number,
+    $hashed_password
+  );
+
+  if ($stmt->execute()) {
+    header("Location: login.php");
+    exit();
+  } else {
+    $stmt->close();
+    $conn->close();
+
+    header("Location: register.php?error=unknown");
+    exit();
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,12 +91,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" />
   </head>
-  <body>
+  <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
         <div class="container">
           <a
-            href="index.html"
+            href="index.php"
             class="navbar-brand my-auto h1">
             Ukay-Ukay Shopping
           </a>
@@ -34,23 +110,50 @@
           <div
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
-            <div class="navbar-nav ms-auto small">
-              <a
-                class="nav-link py-md-0"
-                href="login.html">
-                Shop
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="register.html">
-                Register
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="login.html">
-                Login
-              </a>
-            </div>
+            <?php if (isset($_SESSION["customer"])): ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="shop.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="cart.php">
+                  Cart <?php if (isset($_SESSION["cart"])): ?>
+                      (<?php echo array_sum($_SESSION["cart"]); ?>)
+                  <?php endif; ?>
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="profile.php">
+                  Profile
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="logout.php">
+                  Logout
+                </a>
+              </div>
+            <?php else: ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="register.php">
+                  Register
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Login
+                </a>
+              </div>
+            <?php endif; ?>
             <form class="ms-auto">
               <div class="input-group input-group-sm">
                 <input
@@ -92,10 +195,27 @@
       <section class="container my-5">
         <div class="p-5 bg-body-tertiary rounded-3">
           <form
-            action="includes/customer.php"
+            action="<?php echo $_SERVER["PHP_SELF"]; ?>"
             method="post"
             class="needs-validation"
             novalidate>
+            <?php if (isset($_GET["error"])): ?>
+              <div class="row justify-content-center mb-3">
+                <div class="col-lg-6">
+                  <div class="alert alert-danger" role="alert">
+                    <?php if ($_GET["error"] == "unknown") {
+                      echo "Something went wrong. Please try again.";
+                    } elseif ($_GET["error"] == "email") {
+                      echo "Email address already exists.";
+                    } elseif ($_GET["error"] == "password_match") {
+                      echo "Password does not match.";
+                    } elseif ($_GET["error"] == "password_length") {
+                      echo "Password must be at least 8 characters.";
+                    } ?>
+                  </div>
+                </div>
+              </div>
+            <?php endif; ?>
             <div class="row g-3 justify-content-center mb-3">
               <div class="col-sm-4 col-lg-2">
                 <label
@@ -197,7 +317,7 @@
                   id="password"
                   name="password"
                   required />
-                <div class="invalid-feedback">Please provide a valid password.</div>
+                <div class="invalid-feedback">Password must be at least 8 characters long.</div>
               </div>
               <div class="col-sm-6 col-lg-3">
                 <label
@@ -211,7 +331,7 @@
                   id="confirm_password"
                   name="confirm_password"
                   required />
-                <div class="invalid-feedback">Please provide a valid password.</div>
+                  <div class="invalid-feedback">Password does not match.</div>
               </div>
             </div>
             <div class="text-center">
@@ -235,5 +355,71 @@
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"></script>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const forms = document.querySelectorAll(".needs-validation");
+
+        Array.from(forms).forEach((form) => {
+          form.addEventListener(
+            "submit",
+            (event) => {
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+
+              form.classList.add("was-validated");
+            },
+            false
+          );
+        });
+
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirm_password");
+
+        function validatePasswordStrength() {
+          if (password.value.length < 8) {
+            password.setCustomValidity("Password must be at least 8 characters long");
+          } else {
+            password.setCustomValidity("");
+          }
+        }
+
+        function validatePassword() {
+          if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("Passwords Don't Match");
+          } else {
+            confirmPassword.setCustomValidity("");
+          }
+        }
+
+        password.addEventListener("keyup", validatePasswordStrength);
+        password.addEventListener("keyup", validatePassword);
+        confirmPassword.addEventListener("keyup", validatePassword);
+
+        const phoneNumber = document.getElementById("phone_number");
+
+        function validatePhoneNumber() {
+          const regex = /^\d{11}$/;
+
+          if (regex.test(phoneNumber.value)) {
+            phoneNumber.setCustomValidity("");
+          } else {
+            phoneNumber.setCustomValidity("Please provide a valid phone number");
+          }
+        }
+
+        phoneNumber.addEventListener("keyup", validatePhoneNumber);
+      })();
+
+      const theme = localStorage.getItem("theme");
+
+      if (theme) {
+        document.body.dataset.bsTheme = theme;
+      }
+    </script>
   </body>
 </html>

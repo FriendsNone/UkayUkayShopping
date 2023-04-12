@@ -1,3 +1,9 @@
+<?php
+
+session_start(); 
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,12 +21,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" />
   </head>
-  <body>
+  <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
         <div class="container">
           <a
-            href="index.html"
+            href="index.php"
             class="navbar-brand my-auto h1">
             Ukay-Ukay Shopping
           </a>
@@ -34,23 +40,50 @@
           <div
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
-            <div class="navbar-nav ms-auto small">
-              <a
-                class="nav-link py-md-0"
-                href="login.html">
-                Shop
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="register.html">
-                Register
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="login.html">
-                Login
-              </a>
-            </div>
+            <?php if (isset($_SESSION["customer"])): ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="shop.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="cart.php">
+                  Cart <?php if (isset($_SESSION["cart"])): ?>
+                      (<?= array_sum($_SESSION["cart"]) ?>)
+                  <?php endif; ?>
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="profile.php">
+                  Profile
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="logout.php">
+                  Logout
+                </a>
+              </div>
+            <?php else: ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="register.php">
+                  Register
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Login
+                </a>
+              </div>
+            <?php endif; ?>
             <form class="ms-auto">
               <div class="input-group input-group-sm">
                 <input
@@ -91,7 +124,7 @@
           </p>
           <a
             class="btn btn-primary btn-lg mt-5 px-4 rounded-pill"
-            href="shop.html"
+            href="shop.php"
             role="button">
             Shop now!
           </a>
@@ -101,13 +134,43 @@
 
     <!-- TODO: Add featured items carousel here -->
 
-    <footer class="container py-3 mt-5 border-top">
-      <p class="text-center text-body-secondary">© 2023 Ukay-Ukay Shopping</p>
+    <footer class="container py-3 mt-5 border-top text-center">
+      <p class=" text-body-secondary">© 2023 Ukay-Ukay Shopping</p>
+      <input
+        type="checkbox"
+        class="btn-check"
+        id="theme" />
+        <label class="btn btn-sm btn-outline-secondary" for="theme">
+          <i class="bi bi-magic"></i>
+        </label>
     </footer>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"></script>
+
+    <script>
+      const themeSwitcher = document.querySelector("#theme");
+      const theme = localStorage.getItem("theme");
+
+      if (theme) {
+        document.body.dataset.bsTheme = theme;
+      }
+
+      if (document.body.dataset.bsTheme === "dark") {
+        themeSwitcher.checked = true;
+      }
+
+      themeSwitcher.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          document.body.dataset.bsTheme = "dark";
+          localStorage.setItem("theme", "dark");
+        } else {
+          document.body.dataset.bsTheme = "light";
+          localStorage.setItem("theme", "light");
+        }
+      });
+    </script>
   </body>
 </html>

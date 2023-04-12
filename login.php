@@ -1,3 +1,61 @@
+<?php
+
+session_start();
+
+if (isset($_SESSION["customer"])) {
+  header("Location: shop.php");
+  exit();
+}
+
+require_once "includes/database.php";
+
+if (isset($_POST["login"])) {
+  $email_address = $_POST["email_address"];
+  $password = $_POST["password"];
+
+  $stmt = $conn->prepare("SELECT customer_id FROM customer WHERE email_address = ?");
+  $stmt->bind_param("s", $email_address);
+  $stmt->execute();
+  $stmt->store_result();
+
+  if ($stmt->num_rows == 0) {
+    $stmt->close();
+    $conn->close();
+    unset($_POST);
+
+    header("Location: login.php?error=email");
+    exit();
+  }
+
+  $stmt->bind_result($customer_id);
+  $stmt->fetch();
+
+  $stmt = $conn->prepare("SELECT password FROM customer WHERE customer_id = ?");
+  $stmt->bind_param("i", $customer_id);
+  $stmt->execute();
+  $stmt->bind_result($password_hash);
+  $stmt->fetch();
+
+  if (password_verify($password, $password_hash)) {
+    $stmt->close();
+    $conn->close();
+    unset($_POST);
+
+    $_SESSION["customer"] = $customer_id;
+
+    header("Location: shop.php");
+    exit();
+  } else {
+    $stmt->close();
+    $conn->close();
+    unset($_POST);
+
+    header("Location: login.php?error=password");
+    exit();
+  }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -15,12 +73,12 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" />
   </head>
-  <body>
+  <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
         <div class="container">
           <a
-            href="index.html"
+            href="index.php"
             class="navbar-brand my-auto h1">
             Ukay-Ukay Shopping
           </a>
@@ -34,23 +92,50 @@
           <div
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
-            <div class="navbar-nav ms-auto small">
-              <a
-                class="nav-link py-md-0"
-                href="login.html">
-                Shop
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="register.html">
-                Register
-              </a>
-              <a
-                class="nav-link py-md-0"
-                href="login.html">
-                Login
-              </a>
-            </div>
+            <?php if (isset($_SESSION["customer"])): ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="shop.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="cart.php">
+                  Cart <?php if (isset($_SESSION["cart"])): ?>
+                      (<?php echo array_sum($_SESSION["cart"]); ?>)
+                  <?php endif; ?>
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="profile.php">
+                  Profile
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="logout.php">
+                  Logout
+                </a>
+              </div>
+            <?php else: ?>
+              <div class="navbar-nav ms-auto small">
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Shop
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="register.php">
+                  Register
+                </a>
+                <a
+                  class="nav-link py-md-0"
+                  href="login.php">
+                  Login
+                </a>
+              </div>
+            <?php endif; ?>
             <form class="ms-auto">
               <div class="input-group input-group-sm">
                 <input
@@ -92,10 +177,27 @@
       <section class="container my-5">
         <div class="p-5 bg-body-tertiary rounded-3">
           <form
-            action="includes/customer.php"
+            action="<?php echo $_SERVER["PHP_SELF"]; ?>"
             method="post"
             class="needs-validation"
             novalidate>
+            <?php if (isset($_GET["error"])): ?>
+              <div class="row justify-content-center mb-3">
+                <div class="col-lg-6">
+                  <div class="alert alert-danger" role="alert">
+                    <?php if ($_GET["error"] == "unknown") {
+                      echo "Something went wrong. Please try again.";
+                    } elseif ($_GET["error"] == "email") {
+                      echo "Account does not exist.";
+                    } elseif ($_GET["error"] == "password") {
+                      echo "Password does not match.";
+                    } elseif ($_GET["error"] == "login") {
+                      echo "Please login to continue.";
+                    } ?>
+                  </div>
+                </div>
+              </div>
+            <?php endif; ?>
             <div class="row justify-content-center mb-3">
               <div class="col-lg-6">
                 <label
@@ -109,7 +211,7 @@
                   id="email_address"
                   name="email_address"
                   required />
-                <div class="invalid-feedback">Please provide a valid address.</div>
+                <div class="invalid-feedback">Please provide a valid email.</div>
               </div>
             </div>
             <div class="row justify-content-center mb-3">
@@ -149,5 +251,34 @@
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"></script>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const forms = document.querySelectorAll(".needs-validation");
+
+        Array.from(forms).forEach((form) => {
+          form.addEventListener(
+            "submit",
+            (event) => {
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+
+              form.classList.add("was-validated");
+            },
+            false
+          );
+        });
+      })();
+
+      const theme = localStorage.getItem("theme");
+
+      if (theme) {
+      document.body.dataset.bsTheme = theme;
+      }
+    </script>
   </body>
 </html>
