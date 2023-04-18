@@ -1,12 +1,13 @@
 <?php
 
 session_start();
-require_once "includes/database.php";
 
 if (!isset($_SESSION["customer"])) {
-  header("Location: login.php?error=login");
+  header("Location: login.php?status=login");
   exit();
 }
+
+require_once "includes/database.php";
 
 if (isset($_SESSION["cart"]) && count($_SESSION["cart"]) > 0) {
   $cart = $_SESSION["cart"];
@@ -77,6 +78,7 @@ if (isset($_POST["cart_item_empty"])) {
   exit();
 }
 
+echo "<h1>TODO: Remove quantity before checkout</h1>";
 if (isset($_POST["cart_checkout"])) {
   $stmt = $conn->prepare("INSERT INTO sales_order (customer_id) VALUES (?)");
   $stmt->bind_param("i", $_SESSION["customer"]);
@@ -91,8 +93,8 @@ if (isset($_POST["cart_checkout"])) {
   }
 
   unset($_SESSION["cart"]);
-
   header("Location: cart.php?success=checkout");
+  exit();
 }
 ?>
 
@@ -133,46 +135,46 @@ if (isset($_POST["cart_checkout"])) {
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-              <div class="navbar-nav ms-auto small">
-                <a
-                  class="nav-link py-md-0"
-                  href="shop.php">
-                  Shop
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="cart.php">
-                  Cart (<?= array_sum($_SESSION["cart"]) ?? "0" ?>)
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="profile.php">
-                  Profile
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="logout.php">
-                  Logout
-                </a>
-              </div>
+            <div class="navbar-nav ms-auto small">
+              <a
+                class="nav-link py-md-0"
+                href="shop.php">
+                Shop
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="cart.php">
+                Cart (<?= isset($_SESSION["cart"]) ? array_sum($_SESSION["cart"]) : "0" ?>)
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="profile.php">
+                Profile
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="logout.php">
+                Logout
+              </a>
+            </div>
             <?php else: ?>
-              <div class="navbar-nav ms-auto small">
-                <a
-                  class="nav-link py-md-0"
-                  href="login.php">
-                  Shop
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="register.php">
-                  Register
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="login.php">
-                  Login
-                </a>
-              </div>
+            <div class="navbar-nav ms-auto small">
+              <a
+                class="nav-link py-md-0"
+                href="shop.php">
+                Shop
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="register.php">
+                Register
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="login.php">
+                Login
+              </a>
+            </div>
             <?php endif; ?>
             <form class="ms-auto">
               <div class="input-group input-group-sm">
@@ -194,151 +196,155 @@ if (isset($_POST["cart_checkout"])) {
     </header>
 
     <main>
-      <section class="container my-5">
-        <div class="p-5 text-center bg-body-tertiary rounded-3">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100"
-            height="100"
-            fill="currentColor"
-            class="bi bi-cart mb-5"
-            viewBox="0 0 16 16">
-            <path
-              d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-          </svg>
-          <h1 class="text-body-emphasis">Shopping Cart</h1>
-        </div>
+      <section class="container mb-5 mt-sm-5 px-3 py-5 px-sm-5 text-center bg-body-tertiary rounded">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="100"
+          fill="currentColor"
+          class="bi bi-cart mb-5"
+          viewBox="0 0 16 16">
+          <path
+            d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+        </svg>
+        <h1 class="text-body-emphasis">Shopping Cart</h1>
       </section>
 
-      <section class="container my-5">
-        <?php if (!isset($products)): ?>
-          <div class="p-5 text-center bg-body-tertiary rounded-3">
-            <h2 class="text-body-emphasis">There's nothing but emptiness in your cart.</h2>
-            <p class="col-lg-8 mx-auto fs-5 text-muted">
-              You can start shopping by clicking the button below.
-            </p>
-            <a
-              class="btn btn-primary btn-lg mt-5 px-4 rounded-pill"
-              href="shop.php"
-              role="button">
-              Shop now!
-            </a>
-          </div>
-        <?php else: ?>
-          <div class="row gy-5 gx-lg-5">
-            <div class="col-lg-8">
-              <div class="p-5 bg-body-tertiary rounded-3">
-                <h2 class="text-body-emphasis m-0">Item List</h2>
-                <div class="mt-5 table-responsive">
-                  <table class="table table-hover text-center">
-                    <thead>
-                      <tr>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <?php foreach ($products as $product): ?>
-                        <tr>
-                          <th scope="row"><?= $product["name"] ?></th>
-                          <td>&#8369;<?= $product["price"] ?></td>
-                          <td><?= $cart[$product["product_id"]] ?></td>
-                          <td>&#8369;<?= $product["price"] * $cart[$product["product_id"]] ?></td>
-                          <td>
-                            <form
-                              action="<?php echo $_SERVER["PHP_SELF"]; ?>"
-                              method="post"
-                              class="d-flex flex-row gap-1 justify-content-center">
-                              <input
-                              type="hidden"
-                              name="cart_item_id"
-                              value="<?= $product["product_id"] ?>" />
-                              <button
-                                type="submit"
-                                class="btn btn-outline-secondary btn-sm"
-                                name="cart_item_add">
-                                <i class="bi bi-plus"></i>
-                              </button>
-                              <button
-                                type="submit"
-                                class="btn btn-outline-secondary btn-sm"
-                                name="cart_item_remove">
-                                <i class="bi bi-dash"></i>
-                              </button>
-                              <button
-                                type="submit"
-                                class="btn btn-danger btn-sm"
-                                name="cart_item_delete">
-                                <i class="bi bi-trash"></i>
-                              </button>
-                            </form>
-                          </td>
-                        </tr>
-                      <?php endforeach; ?>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4">
-              <div class="p-5 bg-body-tertiary rounded-3">
-                <h2 class="text-body-emphasis m-0">Order Details</h2>
-                <div class="row row-cols-1 mt-3">
-                  <p class="m-0"><strong>Number of items:</strong> <?= array_sum($cart) ?></p>
-                  <p class="m-0"><strong>Total Cost:</strong> &#8369;<?= $cart_total ?></p>
-                </div>
-                <div class="mt-5">
-                  <button
-                    class="btn btn-outline-success px-4 rounded-pill"
-                    data-bs-toggle="modal"
-                    data-bs-target="#checkoutModal">
-                    Checkout
-                  </button>
-                </div>
-                <div class="mt-3">
-                  <form
-                    action="<?php echo $_SERVER["PHP_SELF"]; ?>"
-                    method="post">
-                    <button
-                      type="submit"
-                      class="btn btn-outline-danger px-4 rounded-pill"
-                      name="cart_item_empty">
-                      Empty Cart
-                    </button>
-                  </form>
-                <div class="mt-3">
-                  <a
-                    class="btn btn-outline-secondary px-4 rounded-pill"
-                    href="shop.php">
-                    Continue Shopping
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        <?php endif; ?>
+      <?php if (!isset($products)): ?>
+      <section class="container mb-5 mt-sm-5 p-5 text-center bg-body-tertiary rounded">
+        <h2 class="text-body-emphasis">There's nothing but emptiness in your cart.</h2>
+        <p class="col-lg-8 mx-auto fs-5 text-muted">You can start shopping by clicking the button below.</p>
+        <a
+          class="btn btn-primary btn-lg mt-5 px-4 rounded-pill"
+          href="shop.php"
+          role="button">
+          Shop now!
+        </a>
       </section>
+      <?php else: ?>
+      <div class="container mb-5 mt-sm-5 bg-body-tertiary rounded">
+        <div class="row">
+          <section class="col-lg-8 p-3 p-sm-5">
+            <h2 class="mb-5 text-body-emphasis">Item List</h2>
+            <div class="table-responsive">
+              <table class="table table-hover text-center">
+                <thead>
+                  <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($products as $product): ?>
+                  <tr>
+                    <th scope="row"><?= $product["name"] ?></th>
+                    <td>&#8369;<?= $product["price"] ?></td>
+                    <td><?= $cart[$product["product_id"]] ?></td>
+                    <td>&#8369;<?= $product["price"] * $cart[$product["product_id"]] ?></td>
+                    <td>
+                      <form
+                        action="<?php echo $_SERVER["PHP_SELF"]; ?>"
+                        method="post"
+                        class="m-0 y-0 d-flex flex-row gap-1 justify-content-center">
+                        <input
+                          type="hidden"
+                          name="cart_item_id"
+                          value="<?= $product["product_id"] ?>" />
+                        <button
+                          type="submit"
+                          class="btn btn-outline-secondary btn-sm"
+                          name="cart_item_add">
+                          <i class="bi bi-plus"></i>
+                        </button>
+                        <button
+                          type="submit"
+                          class="btn btn-outline-secondary btn-sm"
+                          name="cart_item_remove">
+                          <i class="bi bi-dash"></i>
+                        </button>
+                        <button
+                          type="submit"
+                          class="btn btn-danger btn-sm"
+                          name="cart_item_delete">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section class="col-lg-4 p-3 p-sm-5">
+            <h2 class="mb-5 text-body-emphasis">Order Details</h2>
+            <div class="d-flex flex-column gap-1">
+              <p class="m-0"><strong>Number of items:</strong> <?= array_sum($cart) ?></p>
+              <p class="m-0"><strong>Total Cost:</strong> &#8369;<?= $cart_total ?></p>
+            </div>
+            <form
+              action="<?php echo $_SERVER["PHP_SELF"]; ?>"
+              method="post"
+              class="mt-5">
+              <button
+                type="button"
+                class="btn btn-outline-success px-3 rounded-pill"
+                data-bs-toggle="modal"
+                data-bs-target="#checkoutModal">
+                Checkout
+              </button>
+              <button
+                type="submit"
+                class="btn btn-outline-danger px-3 rounded-pill"
+                name="cart_item_empty">
+                Empty Cart
+              </button>
+              <a
+                class="btn btn-outline-secondary mt-2 px-3 rounded-pill"
+                href="shop.php">
+                Continue Shopping
+              </a>
+            </form>
+          </section>
+        </div>
+      </div>
+      <?php endif; ?>
     </main>
 
-    <footer class="container py-3 mt-5 border-top">
-      <p class="text-center text-body-secondary">© 2023 Ukay-Ukay Shopping</p>
+    <footer class="container py-3 mt-5 border-top text-center text-body-secondary">
+      <p>© 2023 Ukay-Ukay Shopping</p>
     </footer>
 
-    <div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div
+      class="modal fade"
+      id="checkoutModal"
+      tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">Proceed checkout</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <h1
+              class="modal-title fs-5"
+              id="exampleModalLabel">
+              Proceed checkout
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <p>Are you sure you want to checkout?</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal">
+              Cancel
+            </button>
             <form
               action="<?php echo $_SERVER["PHP_SELF"]; ?>"
               method="post">
@@ -348,6 +354,7 @@ if (isset($_POST["cart_checkout"])) {
                 name="cart_checkout">
                 Checkout
               </button>
+            </form>
           </div>
         </div>
       </div>
@@ -360,10 +367,7 @@ if (isset($_POST["cart_checkout"])) {
 
     <script>
       const theme = localStorage.getItem("theme");
-
-      if (theme) {
-        document.body.dataset.bsTheme = theme;
-      }
+      if (theme) document.body.dataset.bsTheme = theme;
     </script>
   </body>
 </html>
