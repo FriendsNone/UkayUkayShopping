@@ -47,7 +47,7 @@ $stmt->fetch();
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container">
+        <div class="container my-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -64,7 +64,7 @@ $stmt->fetch();
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -87,7 +87,7 @@ $stmt->fetch();
               </a>
             </div>
             <?php else: ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -105,20 +105,6 @@ $stmt->fetch();
               </a>
             </div>
             <?php endif; ?>
-            <form class="ms-auto">
-              <div class="input-group input-group-sm">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search" />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="search">
-                  <i class="bi bi-search"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </nav>

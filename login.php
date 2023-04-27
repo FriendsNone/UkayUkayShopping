@@ -77,7 +77,7 @@ if (isset($_POST["login"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container">
+        <div class="container my-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -94,61 +94,47 @@ if (isset($_POST["login"])) {
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-              <div class="navbar-nav ms-auto small">
-                <a
-                  class="nav-link py-md-0"
-                  href="shop.php">
-                  Shop
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="cart.php">
-                  Cart (<?= isset($_SESSION["cart"]) ? array_sum($_SESSION["cart"]) : "0" ?>)
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="profile.php">
-                  Profile
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="logout.php">
-                  Logout
-                </a>
-              </div>
+            <div class="navbar-nav ms-auto">
+              <a
+                class="nav-link py-md-0"
+                href="shop.php">
+                Shop
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="cart.php">
+                Cart (<?= isset($_SESSION["cart"]) ? array_sum($_SESSION["cart"]) : "0" ?>)
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="profile.php">
+                Profile
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="logout.php">
+                Logout
+              </a>
+            </div>
             <?php else: ?>
-              <div class="navbar-nav ms-auto small">
-                <a
-                  class="nav-link py-md-0"
-                  href="shop.php">
-                  Shop
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="register.php">
-                  Register
-                </a>
-                <a
-                  class="nav-link py-md-0"
-                  href="login.php">
-                  Login
-                </a>
-              </div>
+            <div class="navbar-nav ms-auto">
+              <a
+                class="nav-link py-md-0"
+                href="shop.php">
+                Shop
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="register.php">
+                Register
+              </a>
+              <a
+                class="nav-link py-md-0"
+                href="login.php">
+                Login
+              </a>
+            </div>
             <?php endif; ?>
-            <form class="ms-auto">
-              <div class="input-group input-group-sm">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search" />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="search">
-                  <i class="bi bi-search"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </nav>

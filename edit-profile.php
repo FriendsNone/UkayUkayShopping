@@ -145,13 +145,6 @@ if (isset($_POST["change_password"])) {
   $new_password = $_POST["new_password"];
   $confirm_new_password = $_POST["confirm_new_password"];
 
-  // $stmt = $conn->prepare("SELECT password FROM customer WHERE customer_id = ?");
-  // $stmt->bind_param("i", $customer_id);
-  // $stmt->execute();
-  // $stmt->store_result();
-  // $stmt->bind_result($password);
-  // $stmt->fetch();
-
   if (!password_verify($current_password, $password)) {
     header("Location: edit-profile.php?status=password_current");
     exit();
@@ -213,7 +206,7 @@ if (isset($_POST["change_password"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container">
+        <div class="container my-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -230,7 +223,7 @@ if (isset($_POST["change_password"])) {
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -253,7 +246,7 @@ if (isset($_POST["change_password"])) {
               </a>
             </div>
             <?php else: ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -271,20 +264,6 @@ if (isset($_POST["change_password"])) {
               </a>
             </div>
             <?php endif; ?>
-            <form class="ms-auto">
-              <div class="input-group input-group-sm">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search" />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="search">
-                  <i class="bi bi-search"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </nav>

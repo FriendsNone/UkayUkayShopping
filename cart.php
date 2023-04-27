@@ -79,16 +79,19 @@ if (isset($_POST["cart_item_empty"])) {
 }
 
 echo "<h1>TODO: Remove quantity before checkout</h1>";
+echo "<h1>TODO: Add feedback</h1>";
 if (isset($_POST["cart_checkout"])) {
-  $stmt = $conn->prepare("INSERT INTO sales_order (customer_id) VALUES (?)");
-  $stmt->bind_param("i", $_SESSION["customer"]);
+  $stmt = $conn->prepare("INSERT INTO sales_order (customer_id, items, total) VALUES (?, ?, ?)");
+  $stmt->bind_param("iis", $_SESSION["customer"], array_sum($cart), $cart_total);
   $stmt->execute();
 
   $sales_id = $conn->insert_id;
 
   foreach ($products as $product) {
-    $stmt = $conn->prepare("INSERT INTO sales_order_items (sales_id, product_id, quantity) VALUES (?, ?, ?)");
-    $stmt->bind_param("iii", $sales_id, $product["product_id"], $cart[$product["product_id"]]);
+    $item_total = $product["price"] * $cart[$product["product_id"]];
+
+    $stmt = $conn->prepare("INSERT INTO sales_order_item (sales_id, product_id, quantity, total) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("iiis", $sales_id, $product["product_id"], $cart[$product["product_id"]], $item_total);
     $stmt->execute();
   }
 
@@ -118,7 +121,7 @@ if (isset($_POST["cart_checkout"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container">
+        <div class="container my-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -135,7 +138,7 @@ if (isset($_POST["cart_checkout"])) {
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -158,7 +161,7 @@ if (isset($_POST["cart_checkout"])) {
               </a>
             </div>
             <?php else: ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -176,20 +179,6 @@ if (isset($_POST["cart_checkout"])) {
               </a>
             </div>
             <?php endif; ?>
-            <form class="ms-auto">
-              <div class="input-group input-group-sm">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search" />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="search">
-                  <i class="bi bi-search"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </nav>

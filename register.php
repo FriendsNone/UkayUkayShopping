@@ -101,7 +101,7 @@ if (isset($_POST["register"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container">
+        <div class="container my-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -118,7 +118,7 @@ if (isset($_POST["register"])) {
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -141,10 +141,10 @@ if (isset($_POST["register"])) {
               </a>
             </div>
             <?php else: ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
-                href="shops.php">
+                href="shop.php">
                 Shop
               </a>
               <a
@@ -159,20 +159,6 @@ if (isset($_POST["register"])) {
               </a>
             </div>
             <?php endif; ?>
-            <form class="ms-auto">
-              <div class="input-group input-group-sm">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search" />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="search">
-                  <i class="bi bi-search"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </nav>
@@ -196,6 +182,7 @@ if (isset($_POST["register"])) {
       </section>
 
       <section class="container mb-5 mt-sm-5 p-3 p-sm-5 bg-body-tertiary rounded">
+        <h1>TODO: Implement Multi-factor authentication</h1>
         <form
           action="<?php echo $_SERVER["PHP_SELF"]; ?>"
           method="post"

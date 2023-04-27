@@ -9,6 +9,16 @@ if (!isset($_SESSION["customer"])) {
 
 require_once "includes/database.php";
 
+$stmt = $conn->prepare("SELECT * FROM product_category");
+$stmt->execute();
+$result = $stmt->get_result();
+
+$categories = [];
+
+while ($row = $result->fetch_assoc()) {
+  $categories[] = $row;
+}
+
 $stmt = $conn->prepare("SELECT * FROM product");
 $stmt->execute();
 $result = $stmt->get_result();
@@ -17,6 +27,59 @@ $products = [];
 
 while ($row = $result->fetch_assoc()) {
   $products[] = $row;
+}
+
+if (isset($_GET["search"]) && !empty($_GET["search"])) {
+  $search = $_GET["search"];
+
+  $products = array_filter($products, function ($product) use ($search) {
+    return strpos($product["name"], $search) !== false;
+  });
+}
+
+if (isset($_GET["category"]) && $_GET["category"] != 0) {
+  $category = $_GET["category"];
+
+  $products = array_filter($products, function ($product) use ($category) {
+    return $product["category_id"] == $category;
+  });
+}
+
+if (isset($_GET["sort"]) && $_GET["sort"] != 0) {
+  $sort = $_GET["sort"];
+
+  switch ($sort) {
+    case 1:
+      usort($products, function ($a, $b) {
+        return strnatcmp($a["name"], $b["name"]);
+      });
+      break;
+    case 2:
+      usort($products, function ($a, $b) {
+        return strnatcmp($b["name"], $a["name"]);
+      });
+      break;
+    case 3:
+      usort($products, function ($a, $b) {
+        return $a["price"] <=> $b["price"];
+      });
+      break;
+    case 4:
+      usort($products, function ($a, $b) {
+        return $b["price"] <=> $a["price"];
+      });
+      break;
+    case 5:
+      usort($products, function ($a, $b) {
+        return strtotime($a["date_added"]) <=> strtotime($b["date_added"]);
+      });
+      break;
+    case 6:
+      usort($products, function ($a, $b) {
+        return strtotime($b["date_added"]) <=> strtotime($a["date_added"]);
+      });
+      break;
+  }
 }
 
 if (isset($_POST["add_to_cart"])) {
@@ -64,7 +127,7 @@ if (isset($_POST["add_to_cart"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container">
+        <div class="container my-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -81,7 +144,7 @@ if (isset($_POST["add_to_cart"])) {
             class="collapse navbar-collapse d-md-flex flex-column gap-2"
             id="navbarNav">
             <?php if (isset($_SESSION["customer"])): ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -104,7 +167,7 @@ if (isset($_POST["add_to_cart"])) {
               </a>
             </div>
             <?php else: ?>
-            <div class="navbar-nav ms-auto small">
+            <div class="navbar-nav ms-auto">
               <a
                 class="nav-link py-md-0"
                 href="shop.php">
@@ -122,20 +185,6 @@ if (isset($_POST["add_to_cart"])) {
               </a>
             </div>
             <?php endif; ?>
-            <form class="ms-auto">
-              <div class="input-group input-group-sm">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Search" />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="search">
-                  <i class="bi bi-search"></i>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </nav>
@@ -156,9 +205,61 @@ if (isset($_POST["add_to_cart"])) {
         <h1 class="text-body-emphasis">All Products</h1>
       </section>
 
-      
       <section class="container mb-5 mt-sm-5 p-3 p-sm-5 bg-body-tertiary rounded">
-        <h1>TODO: Add search and filter</h1>
+        <form
+          class="row g-3 mb-5"
+          action="<?php echo $_SERVER["PHP_SELF"]; ?>"
+          method="get">
+          <div class="col-md-4">
+            <label
+              for="search"
+              class="form-label">
+              Search
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="search"
+              name="search"
+              placeholder="Search"/>
+          </div>
+          <div class="col-md-4">
+            <label
+              for="sort"
+              class="form-label">
+              Sort by
+            </label>
+            <select
+              id="sort"
+              name="sort"
+              class="form-select">
+              <option value="0">Choose...</option>
+              <option value="1">Name (A-Z)</option>
+              <option value="2">Name (Z-A)</option>
+              <option value="3">Price (low to high)</option>
+              <option value="4">Price (high to low)</option>
+              <option value="5">Date added (oldest to newest)</option>
+              <option value="6">Date added (newest to oldest)</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label
+              for="category"
+              class="form-label">
+              Category
+            </label>
+            <select
+              id="category"
+              name="filter"
+              class="form-select">
+              <option value="0">Choose...</option>
+              <?php foreach ($categories as $category): ?>
+              <option value="<?= $category["id"] ?>"><?= $category["name"] ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </form>
+
         <div class="row row-cols-1 row-cols-lg-2 g-3">
           <?php foreach ($products as $product): ?>
           <div class="col">
@@ -242,6 +343,28 @@ if (isset($_POST["add_to_cart"])) {
     <script>
       const theme = localStorage.getItem("theme");
       if (theme) document.body.dataset.bsTheme = theme;
+
+      const sort = document.getElementById('sort');
+        const category = document.getElementById('category');
+        const search = document.getElementById('search');
+
+        sort.addEventListener('change', function () {
+          this.form.submit();
+        });
+
+        category.addEventListener('change', function () {
+          this.form.submit();
+        });
+
+        search.addEventListener('keyup', function (event) {
+          if (event.key === 'Enter') {
+              this.form.submit();
+          }
+        });
+
+        sort.value = <?= isset($_GET["sort"]) ? $_GET["sort"] : 0 ?>;
+        category.value = <?= isset($_GET["filter"]) ? $_GET["filter"] : 0 ?>;
+        search.value = '<?= isset($_GET["search"]) ? $_GET["search"] : "" ?>';
     </script>
   </body>
 </html>
