@@ -8,13 +8,18 @@ if (isset($_SESSION["customer"])) {
 }
 
 $status = $_GET["status"] ?? "";
+$email_address = $_GET["email_address"] ?? "";
 
 $statusMessages = [
   "unknown" => "Something went wrong while logging in. Please try again.",
-  "email" => "This email address is not registered.",
+  "email" => "This email address is not registered. Please <a href='register.php'>register</a> first.",
   "password" => "Your password is incorrect.",
   "login" => "Please login to continue.",
-  "success_register" => "Account created successfully. Please login to continue.",
+  "verify" => isset($_GET["email_address"])
+    ? "Please verify your email address. <a href='verify.php?email_address=$email_address&resend=true'>Resend verification email?</a>."
+    : "Please verify your email address.",
+  "success_register" => "Account created successfully. Check your email to verify.",
+  "success_verify" => "Email address verified successfully. You may now login.",
 ];
 
 $statusSeverity = strpos($status, "success") !== false ? "alert-success" : "alert-danger";
@@ -26,17 +31,24 @@ if (isset($_POST["login"])) {
   $email_address = $_POST["email_address"];
   $password = $_POST["password"];
 
-  $stmt = $conn->prepare("SELECT customer_id FROM customer WHERE email_address = ?");
+  $stmt = $conn->prepare("SELECT customer_id, status FROM customer WHERE email_address = ?");
   $stmt->bind_param("s", $email_address);
   $stmt->execute();
-  $stmt->store_result();
+  $result = $stmt->get_result();
 
-  if ($stmt->num_rows == 0) {
+  if ($result->num_rows == 0) {
     header("Location: login.php?status=email");
     exit();
   }
 
-  $stmt->bind_result($customer_id);
+  $result = $result->fetch_assoc();
+
+  if ($result["status"] !== "VERIFIED") {
+    header("Location: login.php?status=verify&email_address=$email_address");
+    exit();
+  }
+
+  $customer_id = $result["customer_id"];
   $stmt->fetch();
 
   $stmt = $conn->prepare("SELECT password FROM customer WHERE customer_id = ?");

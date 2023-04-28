@@ -11,7 +11,7 @@ $status = $_GET["status"] ?? "";
 
 $statusMessages = [
   "unknown" => "Something went wrong while registering your account. Please try again.",
-  "email" => "This email address is already registered.",
+  "email" => "This email address is already registered. Do you mean to <a href='login.php'>login</a>?",
   "phone_number" => "Your phone number must be 11 digits long.",
   "password_match" => "Your password does not match.",
   "password_length" => "Your password must be at least 8 characters long.",
@@ -29,7 +29,7 @@ if (isset($_POST["register"])) {
   $address = $_POST["address"];
   $email_address = $_POST["email_address"];
   $phone_number = $_POST["phone_number"];
-  $password = password_hash($password, PASSWORD_DEFAULT);
+  $password = $_POST["password"];
   $confirm_password = $_POST["confirm_password"];
 
   $stmt = $conn->prepare("SELECT customer_id FROM customer WHERE email_address = ?");
@@ -52,10 +52,12 @@ if (isset($_POST["register"])) {
     exit();
   }
 
-  if (!password_verify($confirm_password, $password)) {
+  if ($password !== $confirm_password) {
     header("Location: register.php?status=password_match");
     exit();
   }
+
+  $password = password_hash($password, PASSWORD_DEFAULT);
 
   $stmt = $conn->prepare(
     "INSERT INTO customer (first_name, middle_name, last_name, address, email_address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -72,6 +74,27 @@ if (isset($_POST["register"])) {
   );
 
   if (!$stmt->execute()) {
+    header("Location: register.php?status=unknown");
+    exit();
+  }
+
+  require_once "includes/smtp.php";
+
+  $message =
+    "
+    <h1>Hi, $first_name!</h1>
+    <p>Thank you for registering to Ukay-Ukay Shopping. Please click the link below to verify your account.</p>
+    <a href='http://" .
+    $_SERVER["HTTP_HOST"] .
+    "/verify.php?email_address=$email_address'>Verify Account</a>
+  ";
+
+  $mail->addAddress($email_address);
+  $mail->isHTML(true);
+  $mail->Subject = "Account Verification";
+  $mail->Body = $message;
+
+  if (!$mail->send()) {
     header("Location: register.php?status=unknown");
     exit();
   }
@@ -182,7 +205,6 @@ if (isset($_POST["register"])) {
       </section>
 
       <section class="container mb-5 mt-sm-5 p-3 p-sm-5 bg-body-tertiary rounded">
-        <h1>TODO: Implement Multi-factor authentication</h1>
         <form
           action="<?php echo $_SERVER["PHP_SELF"]; ?>"
           method="post"
