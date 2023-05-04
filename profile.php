@@ -47,7 +47,7 @@ $stmt->fetch();
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container my-3">
+        <div class="container my-1 my-md-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">

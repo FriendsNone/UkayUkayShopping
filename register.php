@@ -31,6 +31,7 @@ if (isset($_POST["register"])) {
   $phone_number = $_POST["phone_number"];
   $password = $_POST["password"];
   $confirm_password = $_POST["confirm_password"];
+  $randomness = md5(uniqid(rand(), true));
 
   $stmt = $conn->prepare("SELECT customer_id FROM customer WHERE email_address = ?");
   $stmt->bind_param("s", $email_address);
@@ -60,17 +61,18 @@ if (isset($_POST["register"])) {
   $password = password_hash($password, PASSWORD_DEFAULT);
 
   $stmt = $conn->prepare(
-    "INSERT INTO customer (first_name, middle_name, last_name, address, email_address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO customer (first_name, middle_name, last_name, address, email_address, phone_number, password, randomness) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
   );
   $stmt->bind_param(
-    "sssssss",
+    "ssssssss",
     $first_name,
     $middle_name,
     $last_name,
     $address,
     $email_address,
     $phone_number,
-    $password
+    $password,
+    $randomness
   );
 
   if (!$stmt->execute()) {
@@ -78,28 +80,9 @@ if (isset($_POST["register"])) {
     exit();
   }
 
-  require_once "includes/smtp.php";
+  $id = $stmt->insert_id;
 
-  $message =
-    "
-    <h1>Hi, $first_name!</h1>
-    <p>Thank you for registering to Ukay-Ukay Shopping. Please click the link below to verify your account.</p>
-    <a href='http://" .
-    $_SERVER["HTTP_HOST"] .
-    "/verify.php?email_address=$email_address'>Verify Account</a>
-  ";
-
-  $mail->addAddress($email_address);
-  $mail->isHTML(true);
-  $mail->Subject = "Account Verification";
-  $mail->Body = $message;
-
-  if (!$mail->send()) {
-    header("Location: register.php?status=unknown");
-    exit();
-  }
-
-  header("Location: login.php?status=success_register");
+  header("Location: verify.php?tp=verify&id=$id");
   exit();
 }
 ?>
@@ -124,7 +107,7 @@ if (isset($_POST["register"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container my-3">
+        <div class="container my-1 my-md-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">

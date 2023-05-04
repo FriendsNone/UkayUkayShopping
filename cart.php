@@ -7,6 +7,18 @@ if (!isset($_SESSION["customer"])) {
   exit();
 }
 
+$status = $_GET["status"] ?? "";
+
+$statusMessages = [
+  "checkout" => "There was an error processing your order. Please try again later.",
+  "checkout_mail" => "There was an error sending your order confirmation. Please try again later.",
+  "feedback" => "There was an error sending your feedback. Please try again later.",
+  "feedback_mail" => "There was an error sending your feedback confirmation. Please try again later.",
+];
+
+$statusSeverity = strpos($status, "success") !== false ? "alert-success" : "alert-danger";
+$statusMsg = array_key_exists($status, $statusMessages) ? $statusMessages[$status] : "";
+
 require_once "includes/database.php";
 
 if (isset($_SESSION["cart"]) && count($_SESSION["cart"]) > 0) {
@@ -79,11 +91,79 @@ if (isset($_POST["cart_item_empty"])) {
 }
 
 echo "<h1>TODO: Remove quantity before checkout</h1>";
-echo "<h1>TODO: Add feedback</h1>";
 if (isset($_POST["cart_checkout"])) {
+  require_once "includes/smtp.php";
+
+  $stmt = $conn->prepare("SELECT email_address FROM customer WHERE customer_id = ?");
+  $stmt->bind_param("i", $_SESSION["customer"]);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $result = $result->fetch_assoc();
+  $email_address = $result["email_address"];
+
+  $message =
+    "
+    <h1>Order Confirmation</h1>
+    <p>Thank you for shopping with us!</p>
+    <p>Your order has been received and is being processed. Your order details are shown below for your reference:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>" .
+    array_reduce($products, function ($carry, $product) use ($cart) {
+      $subtotal = $product["price"] * $cart[$product["product_id"]];
+
+      return $carry .
+        "
+            <tr>
+              <td>{$product["name"]}</td>
+              <td>{$cart[$product["product_id"]]}</td>
+              <td>₱" .
+        number_format($product["price"], 2) .
+        "</td>
+              <td>₱" .
+        number_format($subtotal, 2) .
+        "</td>
+            </tr>
+          ";
+    }) .
+    "
+        <tr>
+          <td colspan='3' class='text-end'>Total</td>
+          <td>₱" .
+    number_format($cart_total, 2) .
+    "</td>
+        </tr>
+      </tbody>
+    </table>
+  ";
+
+  $mail->addAddress($email_address);
+  $mail->isHTML(true);
+  $mail->Subject = "Order Confirmation";
+  $mail->Body = $message;
+
+  try {
+    $mail->send();
+  } catch (Exception $e) {
+    header("Location: cart.php?status=checkout_mail");
+    exit();
+  }
+
   $stmt = $conn->prepare("INSERT INTO sales_order (customer_id, items, total) VALUES (?, ?, ?)");
   $stmt->bind_param("iis", $_SESSION["customer"], array_sum($cart), $cart_total);
-  $stmt->execute();
+
+  if (!$stmt->execute()) {
+    header("Location: cart.php?status=checkout");
+    exit();
+  }
 
   $sales_id = $conn->insert_id;
 
@@ -92,11 +172,86 @@ if (isset($_POST["cart_checkout"])) {
 
     $stmt = $conn->prepare("INSERT INTO sales_order_item (sales_id, product_id, quantity, total) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("iiis", $sales_id, $product["product_id"], $cart[$product["product_id"]], $item_total);
-    $stmt->execute();
+
+    if (!$stmt->execute()) {
+      header("Location: cart.php?status=checkout");
+      exit();
+    }
   }
 
   unset($_SESSION["cart"]);
-  header("Location: cart.php?success=checkout");
+  header("Location: cart.php?ok=checkout&sid=$sales_id");
+  exit();
+}
+
+if (isset($_POST["feedback"])) {
+  $customer_id = $_SESSION["customer"];
+  $sales_id = $_POST["sales"];
+  $experience = $_POST["experience"];
+  $loved = $_POST["loved"];
+  $improve = $_POST["improve"];
+  $comment = $_POST["comment"];
+
+  $stmt = $conn->prepare(
+    "INSERT INTO feedback (customer_id, sales_id, experience, loved, improve, comment) VALUES (?, ?, ?, ?, ?, ?)"
+  );
+  $stmt->bind_param("iissss", $customer_id, $sales_id, $experience, $loved, $improve, $comment);
+
+  if (!$stmt->execute()) {
+    header("Location: cart.php?ok=checkout&sid=$sales_id&status=feedback");
+    exit();
+  }
+
+  require_once "includes/smtp.php";
+
+  $stmt = $conn->prepare("SELECT email_address FROM customer WHERE customer_id = ?");
+  $stmt->bind_param("i", $customer_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  $result = $result->fetch_assoc();
+  $email_address = $result["email_address"];
+
+  $message = "
+    <h1>Feedback</h1>
+    <p>Thank you for your feedback!</p>
+    <p>We appreciate your honest feedback and we're looking forward to serve you again!</p>
+    <p>Here's a copy of your feedback:</p>
+    <table>
+      <tbody>
+        <tr>
+          <td>Experience</td>
+          <td>$experience</td>
+        </tr>
+        <tr>
+          <td>Loved</td>
+          <td>$loved</td>
+        </tr>
+        <tr>
+          <td>Improve</td>
+          <td>$improve</td>
+        </tr>
+        <tr>
+          <td>Comment</td>
+          <td>$comment</td>
+        </tr>
+      </tbody>
+    </table>
+  ";
+
+  $mail->addAddress($email_address);
+  $mail->isHTML(true);
+  $mail->Subject = "Feedback";
+  $mail->Body = $message;
+
+  try {
+    $mail->send();
+  } catch (Exception $e) {
+    header("Location: cart.php?ok=checkout&sid=$sales_id&status=feedback_mail");
+    exit();
+  }
+
+  header("Location: cart.php?ok=feedback");
   exit();
 }
 ?>
@@ -121,7 +276,7 @@ if (isset($_POST["cart_checkout"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container my-3">
+        <div class="container my-1 my-md-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
@@ -199,8 +354,128 @@ if (isset($_POST["cart_checkout"])) {
         <h1 class="text-body-emphasis">Shopping Cart</h1>
       </section>
 
-      <?php if (!isset($products)): ?>
-      <section class="container mb-5 mt-sm-5 p-5 text-center bg-body-tertiary rounded">
+      <?php if (isset($_GET["ok"]) && $_GET["ok"] === "checkout"): ?>
+      <section class="container mb-5 mt-sm-5 p-3 p-sm-5 bg-body-tertiary rounded">
+        <div class="row gap-3">
+          <?php if (isset($_GET["status"])): ?>
+          <div class="row justify-content-center mb-3">
+            <div class="col-lg-6">
+              <div
+                class="alert <?= $statusSeverity ?>"
+                role="alert">
+                <?= $statusMsg ?>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
+
+          <div class="col-lg-8 mx-auto text-center">
+            <h2 class="text-body-emphasis mb-3">Checkout successful!</h2>
+          </div>
+
+          <p class="col-lg-8 mx-auto fs-5 fs-5 text-muted mb-3">
+            Thank you for shopping with us. If you have any questions or feedback, please feel free to fill out the form below.
+          </p>
+
+          <form
+            class="col-lg-6 mx-auto"
+            action="<?= $_SERVER["PHP_SELF"] ?>"
+            method="POST">
+            <input
+              type="hidden"
+              name="sales"
+              value="<?= $_GET["sid"] ?>">
+            <input
+              type="hidden"
+              name="customer"
+              value="<?= $_SESSION["customer"] ?>">
+            <div class="mb-3">
+              <label class="form-label">How was the your shopping experience?</label>
+              <div class="btn-group btn-group-lg w-100" role="group">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="experience"
+                  id="experience1"
+                  value="1"
+                  autocomplete="off"
+                  required>
+                <label
+                  class="btn btn-outline-danger" for="experience1">1</label>
+
+                <input type="radio" class="btn-check" name="experience" id="experience2" value="2" autocomplete="off" required>
+                <label class="btn btn-outline-danger" for="experience2">2</label>
+
+                <input type="radio" class="btn-check" name="experience" id="experience3" value="3" autocomplete="off" required>
+                <label class="btn btn-outline-warning" for="experience3">3</label>
+
+                <input type="radio" class="btn-check" name="experience" id="experience4" value="4" autocomplete="off" required>
+                <label class="btn btn-outline-success" for="experience4">4</label>
+
+                <input type="radio" class="btn-check" name="experience" id="experience5" value="5" autocomplete="off" required>
+                <label class="btn btn-outline-success" for="experience5">5</label>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="like" class="form-label">What did you like about your shopping experience?</label>
+              <textarea
+                class="form-control"
+                id="loved"
+                name="loved"
+                rows="3"
+                required></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="improve" class="form-label">What can we improve on?</label>
+              <textarea
+                class="form-control"
+                id="improve"
+                name="improve"
+                rows="3"
+                required></textarea>
+            </div>
+
+            <div class="mb-5">
+              <label for="comment" class="form-label">Other comments</label>
+              <textarea
+                class="form-control"
+                id="comment"
+                name="comment"
+                rows="3"></textarea>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-center">
+              <button
+                type="submit"
+                class="btn btn-primary rounded-pill"
+                name="feedback">
+                Send feedback
+              </button>
+              <a
+                class="btn btn-outline-secondary rounded-pill"
+                href="shop.php"
+                role="button">
+                Shop more!
+              </a>
+            </div>
+          </form>
+        </div>
+      </section>
+      <?php elseif (isset($_GET["ok"]) && $_GET["ok"] === "feedback"): ?>
+        <section class="container mb-5 mt-sm-5 p-3 p-sm-5 text-center bg-body-tertiary rounded">
+        <h2 class="text-body-emphasis">Thank you for your feedback!</h2>
+        <p class="col-lg-8 mx-auto fs-5 text-muted">We appreciate your feedback and will use it to improve our services.</p>
+        <a
+          class="btn btn-primary btn-lg mt-5 px-4 rounded-pill"
+          href="shop.php"
+          role="button">
+          Shop now!
+        </a>
+      </section>  
+      <?php elseif (!isset($products)): ?>
+      <section class="container mb-5 mt-sm-5 p-3 p-sm-5 text-center bg-body-tertiary rounded">
         <h2 class="text-body-emphasis">There's nothing but emptiness in your cart.</h2>
         <p class="col-lg-8 mx-auto fs-5 text-muted">You can start shopping by clicking the button below.</p>
         <a
@@ -212,6 +487,17 @@ if (isset($_POST["cart_checkout"])) {
       </section>
       <?php else: ?>
       <div class="container mb-5 mt-sm-5 bg-body-tertiary rounded">
+        <?php if (isset($_GET["status"])): ?>
+        <div class="row justify-content-center mb-3">
+          <div class="col-lg-6">
+            <div
+              class="alert <?= $statusSeverity ?>"
+              role="alert">
+              <?= $statusMsg ?>
+            </div>
+          </div>
+        </div>
+        <?php endif; ?>
         <div class="row">
           <section class="col-lg-8 p-3 p-sm-5">
             <h2 class="mb-5 text-body-emphasis">Item List</h2>

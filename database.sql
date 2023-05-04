@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 28, 2023 at 12:54 AM
+-- Generation Time: May 05, 2023 at 12:24 AM
 -- Server version: 10.11.2-MariaDB
 -- PHP Version: 7.4.33
 
@@ -37,8 +37,26 @@ CREATE TABLE `customer` (
   `phone_number` varchar(20) NOT NULL,
   `password` varchar(255) NOT NULL,
   `customer_picture` varchar(255) DEFAULT NULL,
-  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` varchar(15) NOT NULL DEFAULT 'PENDING',
+  `randomness` varchar(32) DEFAULT NULL,
+  `date_registered` timestamp NOT NULL DEFAULT current_timestamp(),
   `date_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `feedback_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `sales_id` int(11) NOT NULL,
+  `experience` int(11) DEFAULT NULL,
+  `loved` text DEFAULT NULL,
+  `improve` text DEFAULT NULL,
+  `comment` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -82,7 +100,7 @@ INSERT INTO `product` (`product_id`, `name`, `price`, `description`, `category`,
 --
 
 CREATE TABLE `product_category` (
-  `id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -90,7 +108,7 @@ CREATE TABLE `product_category` (
 -- Dumping data for table `product_category`
 --
 
-INSERT INTO `product_category` (`id`, `name`) VALUES
+INSERT INTO `product_category` (`category_id`, `name`) VALUES
 (1, 'Uncategorized');
 
 -- --------------------------------------------------------
@@ -133,6 +151,14 @@ ALTER TABLE `customer`
   ADD PRIMARY KEY (`customer_id`);
 
 --
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`feedback_id`),
+  ADD KEY `customer_id` (`customer_id`),
+  ADD KEY `sales_id` (`sales_id`);
+
+--
 -- Indexes for table `product`
 --
 ALTER TABLE `product`
@@ -143,7 +169,7 @@ ALTER TABLE `product`
 -- Indexes for table `product_category`
 --
 ALTER TABLE `product_category`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`category_id`);
 
 --
 -- Indexes for table `sales_order`
@@ -171,6 +197,12 @@ ALTER TABLE `customer`
   MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `feedback`
+--
+ALTER TABLE `feedback`
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
@@ -180,7 +212,7 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT for table `product_category`
 --
 ALTER TABLE `product_category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `sales_order`
@@ -193,23 +225,24 @@ ALTER TABLE `sales_order`
 --
 
 --
+-- Constraints for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD CONSTRAINT `CONST_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `CONST_sales_feedback` FOREIGN KEY (`sales_id`) REFERENCES `sales_order` (`sales_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
 -- Constraints for table `product`
 --
 ALTER TABLE `product`
-  ADD CONSTRAINT `CONST_category` FOREIGN KEY (`category`) REFERENCES `product_category` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
--- Constraints for table `sales_order`
---
-ALTER TABLE `sales_order`
-  ADD CONSTRAINT `CONST_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`);
+  ADD CONSTRAINT `CONST_category` FOREIGN KEY (`category`) REFERENCES `product_category` (`category_id`);
 
 --
 -- Constraints for table `sales_order_item`
 --
 ALTER TABLE `sales_order_item`
-  ADD CONSTRAINT `CONST_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
-  ADD CONSTRAINT `CONST_sales_id` FOREIGN KEY (`sales_id`) REFERENCES `sales_order` (`sales_id`);
+  ADD CONSTRAINT `CONST_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
+  ADD CONSTRAINT `CONST_sales` FOREIGN KEY (`sales_id`) REFERENCES `sales_order` (`sales_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

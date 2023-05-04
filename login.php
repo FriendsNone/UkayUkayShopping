@@ -7,18 +7,16 @@ if (isset($_SESSION["customer"])) {
   exit();
 }
 
+$id = $_GET["id"] ?? "";
 $status = $_GET["status"] ?? "";
-$email_address = $_GET["email_address"] ?? "";
 
 $statusMessages = [
   "unknown" => "Something went wrong while logging in. Please try again.",
   "email" => "This email address is not registered. Please <a href='register.php'>register</a> first.",
   "password" => "Your password is incorrect.",
   "login" => "Please login to continue.",
-  "verify" => isset($_GET["email_address"])
-    ? "Please verify your email address. <a href='verify.php?email_address=$email_address&resend=true'>Resend verification email?</a>."
-    : "Please verify your email address.",
-  "success_register" => "Account created successfully. Check your email to verify.",
+  "verify" => "Please verify your email address <a href='verify.php?tp=verify&id=$id'>here</a>.",
+  "verified" => "Your email address is already verified. Please login to continue.",
   "success_verify" => "Email address verified successfully. You may now login.",
 ];
 
@@ -44,7 +42,7 @@ if (isset($_POST["login"])) {
   $result = $result->fetch_assoc();
 
   if ($result["status"] !== "VERIFIED") {
-    header("Location: login.php?status=verify&email_address=$email_address");
+    header("Location: login.php?status=verify&id=" . $result["customer_id"]);
     exit();
   }
 
@@ -89,7 +87,7 @@ if (isset($_POST["login"])) {
   <body data-bs-theme="light">
     <header>
       <nav class="navbar navbar-expand-md bg-body-secondary">
-        <div class="container my-3">
+        <div class="container my-1 my-md-3">
           <a
             href="index.php"
             class="navbar-brand my-auto h1">
